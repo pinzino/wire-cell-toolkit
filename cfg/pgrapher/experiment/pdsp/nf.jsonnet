@@ -98,7 +98,7 @@ function(params, anode, chndbobj, n, name='')
           wc.tn(gaincalib),
         ],
         grouped_filters: [
-          wc.tn(grouped),
+        //  wc.tn(grouped),
         ],
         channel_status_filters: [
         ],
