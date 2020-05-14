@@ -3,12 +3,16 @@ local use_blob_reframer = std.extVar("use_blob_reframer");
 
 local wc = import 'wirecell.jsonnet';
 local g = import 'pgraph.jsonnet';
+local magoutput = 'magnify_output.root';
 
 
 local params = import 'params.jsonnet';
 local tools_maker = import 'pgrapher/common/tools.jsonnet';
 local tools = tools_maker(params);
 local img = import "pgrapher/experiment/pdsp/img.jsonnet";
+local multimagnify = import 'pgrapher/experiment/pdsp/multimagnify.jsonnet';
+local multi_magnify6 = multimagnify('roi', tools, magoutput);
+local magnify_pipes6 = multi_magnify6.magnify_pipelines;
 
 local nanodes = std.length(tools.anodes);
 local anode_iota = std.range(0, nanodes-1);
@@ -75,9 +79,11 @@ local perapa_pipelines = [
         img.magnify(anode, anode.name, "reframe"),
         img.dumpframes(anode, anode.name),
         roi_filter[anode],
+        magnify_pipes6[anode],
       ] else [
         img.dump(anode, anode.name, params.lar.drift_speed),
         roi_filter[anode],
+        magnify_pipes6[anode],
       ], 
       "img-" + anode.name) for anode in tools.anodes];
 
