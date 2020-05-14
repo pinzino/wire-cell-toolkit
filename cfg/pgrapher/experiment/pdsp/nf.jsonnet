@@ -93,12 +93,12 @@ function(params, anode, chndbobj, n, name='')
         // only when the channelmask is merged to `bad`
         maskmap: {sticky: "bad", ledge: "bad", noisy: "bad"},
         channel_filters: [
-          wc.tn(sticky),
-          wc.tn(single),
-          wc.tn(gaincalib),
+          # wc.tn(sticky),
+          # wc.tn(single),
+          # wc.tn(gaincalib),
         ],
         grouped_filters: [
-        //  wc.tn(grouped),
+          # wc.tn(grouped),
         ],
         channel_status_filters: [
         ],
