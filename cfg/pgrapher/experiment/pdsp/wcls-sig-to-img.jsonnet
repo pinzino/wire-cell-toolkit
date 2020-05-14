@@ -51,6 +51,17 @@ local fansel = g.pnode({
     },
 }, nin=1, nout=nanodes, uses=tools.anodes);
 
+local roi_filter = [g.pnode({
+type: 'RegionOfInterestFilter',  //parameter to configure the node (type and name pair should be unique)
+name: 'roi_filter%d' % n,
+data: {
+  roi_tag: 'roi%d' % n,
+  old_tag: 'oriv%d' % n
+}, 
+}, nin=1, nout=1, uses=[]),
+for n in std.range(0, std.length(tools.anodes) - 1) //tools.anodes sono le linee parallele del grafico
+]; 
+
 local perapa_pipelines = [
     g.pipeline([
         img.slicing(anode, anode.name),
@@ -63,8 +74,10 @@ local perapa_pipelines = [
         img.reframing(anode, anode.name),
         img.magnify(anode, anode.name, "reframe"),
         img.dumpframes(anode, anode.name),
+        roi_filter[anode],
       ] else [
         img.dump(anode, anode.name, params.lar.drift_speed),
+        roi_filter[anode],
       ], 
       "img-" + anode.name) for anode in tools.anodes];
 
