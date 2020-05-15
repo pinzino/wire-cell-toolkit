@@ -3,16 +3,13 @@ local use_blob_reframer = std.extVar("use_blob_reframer");
 
 local wc = import 'wirecell.jsonnet';
 local g = import 'pgraph.jsonnet';
-local magoutput = 'magnify_output.root';
+local magoutput = 'protodune-data-check.root';
 
 
 local params = import 'params.jsonnet';
 local tools_maker = import 'pgrapher/common/tools.jsonnet';
 local tools = tools_maker(params);
 local img = import "pgrapher/experiment/pdsp/img.jsonnet";
-local multimagnify = import 'pgrapher/experiment/pdsp/multimagnify.jsonnet';
-local multi_magnify6 = multimagnify('roi', tools, magoutput);
-local magnify_pipes6 = multi_magnify6.magnify_pipelines;
 
 local nanodes = std.length(tools.anodes);
 local anode_iota = std.range(0, nanodes-1);
@@ -55,16 +52,6 @@ local fansel = g.pnode({
     },
 }, nin=1, nout=nanodes, uses=tools.anodes);
 
-local roi_filter = [g.pnode({
-type: 'RegionOfInterestFilter',  //parameter to configure the node (type and name pair should be unique)
-name: 'roi_filter%d' % n,
-data: {
-  roi_tag: 'roi%d' % n,
-  old_tag: 'oriv%d' % n
-}, 
-}, nin=1, nout=1, uses=[]),
-for n in std.range(0, std.length(tools.anodes) - 1) //tools.anodes sono le linee parallele del grafico
-]; 
 
 local perapa_pipelines = [
     g.pipeline([
@@ -78,12 +65,8 @@ local perapa_pipelines = [
         img.reframing(anode, anode.name),
         img.magnify(anode, anode.name, "reframe"),
         img.dumpframes(anode, anode.name),
-        roi_filter[anode],
-        magnify_pipes6[anode],
       ] else [
         img.dump(anode, anode.name, params.lar.drift_speed),
-        roi_filter[anode],
-        magnify_pipes6[anode],
       ], 
       "img-" + anode.name) for anode in tools.anodes];
 

@@ -111,6 +111,17 @@ local fansel = g.pnode({
     },
 }, nin=1, nout=nanodes, uses=tools.anodes);
 
+local roi_filter = [g.pnode({
+type: 'RegionOfInterestFilter',  //parameter to configure the node (type and name pair should be unique)
+name: 'roi_filter%d' % n,
+data: {
+  roi_tag: 'roi%d' % n,
+  old_tag: 'oriv%d' % n
+}, 
+}, nin=1, nout=1, uses=[]),
+for n in std.range(0, std.length(tools.anodes) - 1) //tools.anodes sono le linee parallele del grafico
+]; 
+
 local magoutput = 'protodune-data-check.root';
 local magnify = import 'pgrapher/experiment/pdsp/magnify-sinks.jsonnet';
 local sinks = magnify(tools, magoutput);
@@ -118,6 +129,8 @@ local sinks = magnify(tools, magoutput);
 local pipelines = [
     g.pipeline([
         sinks.orig_pipe[n],
+        roi_filter[n],
+        sinks.roi_pipe[n],
 
         nf_pipes[n],
         sinks.raw_pipe[n],
